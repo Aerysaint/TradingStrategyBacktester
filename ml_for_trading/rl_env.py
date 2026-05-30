@@ -1,12 +1,13 @@
 import gymnasium as gym
 from gymnasium import spaces
 import numpy as np
+from collections import deque
 
 class TradingEnv(gym.Env):
     def __init__(self, df, seq_length, stop_loss_multiplier, transaction_cost=2.5, total_training_steps=50000):
         super(TradingEnv, self).__init__()
         self.df = df.reset_index(drop=True)
-        self.seq_length = seq_length
+        self.seq_length = seq_length # Represents window_size for frame stacking
         self.stop_loss_multiplier = stop_loss_multiplier
         self.max_transaction_cost = transaction_cost # Absolute Index Points penalty per side
         self.total_training_steps = total_training_steps
@@ -24,7 +25,7 @@ class TradingEnv(gym.Env):
         self.feature_cols = [c for c in self.df.columns if c not in ['label', 'Future_Ret', 'rolling_std', price_col, atr_col]]
         self.features = self.df[self.feature_cols].values
         
-        # State space: flattened sequence of features
+        # State space: flattened array of the last N steps (Frame Stacking)
         self.observation_space = spaces.Box(
             low=-np.inf, high=np.inf, 
             shape=(self.seq_length * len(self.feature_cols),), dtype=np.float32
@@ -32,6 +33,7 @@ class TradingEnv(gym.Env):
         
         self.action_space = spaces.Discrete(3) # 0: Hold/Flat, 1: Buy/Long, 2: Sell/Short
         
+        self.frames = deque(maxlen=self.seq_length)
         self.current_step = self.seq_length
         self.position = 0 # 1 for Long, -1 for Short, 0 for Flat
         self.entry_price = 0
@@ -45,10 +47,15 @@ class TradingEnv(gym.Env):
         self.entry_price = 0
         self.flat_duration = 0
         self.done = False
+        
+        # Pre-fill the frame stack
+        for i in range(self.seq_length):
+            self.frames.append(self.features[i])
+            
         return self._next_observation(), {}
         
     def _next_observation(self):
-        obs = self.features[self.current_step - self.seq_length : self.current_step].flatten()
+        obs = np.array(self.frames).flatten()
         return obs.astype(np.float32)
         
     def step(self, action):
@@ -56,6 +63,9 @@ class TradingEnv(gym.Env):
             return self._next_observation(), 0, self.done, False, {}
             
         self.global_step += 1
+        
+        # Append the incoming new feature step to frame stack
+        self.frames.append(self.features[self.current_step])
         
         # Curriculum Learning: Scale transaction costs dynamically from 0 to full fee at 50% training
         current_fee = self.max_transaction_cost * min(1.0, self.global_step / max(1, self.total_training_steps * 0.5))
@@ -86,6 +96,10 @@ class TradingEnv(gym.Env):
         if not forced_close:
             # 1. Execute Position Change (Pay transaction fee if moving)
             if target_position != self.position:
+                # Whipsaw Penalty Rule: Punish instantaneous flips (+1 to -1 or -1 to +1)
+                if (self.position == 1 and target_position == -1) or (self.position == -1 and target_position == 1):
+                    step_reward -= 2.0 # Extra static mathematical punishment for erratic flips
+                
                 # If closing an existing position, we pay a fee.
                 if self.position != 0:
                     actual_pnl -= current_fee

@@ -27,12 +27,21 @@ def load_and_fuse_data(data_dir, norm_window, atr_window):
     df_1m = prep_df(df_1m, '1m')
     df_5m = prep_df(df_5m, '')
     
+    # Pre-compute Macro Trend on 60m data before shifting to prevent leakage
+    df_60m = prep_df(df_60m, '60m')
+    df_60m['SMA_60m'] = df_60m['close_60m'].rolling(window=14).mean()
+    slope_60m = df_60m['SMA_60m'] - df_60m['SMA_60m'].shift(3)
+    # Use rolling std for dynamic thresholds
+    slope_std_60m = slope_60m.rolling(window=100).std().replace(0, 1e-8)
+    df_60m['Macro_Trend_60m'] = np.where(slope_60m > slope_std_60m * 0.5, 1, np.where(slope_60m < -slope_std_60m * 0.5, -1, 0))
+    df_60m.drop(columns=['SMA_60m'], inplace=True)
+    
     # CRITICAL FIX for Data Leakage: Higher timeframe timestamps typically represent 
     # the start of the bar. To prevent the 09:15 5-min candle from seeing the 
     # 09:15-09:30 15-min closure, we explicitly shift the timeframe down by 1 completely 
     # sealing the "future" out of the present features.
     df_15m = prep_df(df_15m, '15m').shift(1)
-    df_60m = prep_df(df_60m, '60m').shift(1)
+    df_60m = df_60m.shift(1)
     df_1d = prep_df(df_1d, '1d').shift(1)
 
     # Aggregate 1m to 5m (e.g., rolling 5-period momentum of close)
@@ -102,7 +111,7 @@ def load_and_fuse_data(data_dir, norm_window, atr_window):
         std[std == 0] = 1e-8
         return (group - mean) / std
 
-    cols_to_norm = [c for c in df_fused.columns if c not in ['sin_time', 'cos_time', 'sin_day', 'cos_day', 'close_unnorm', 'ATR_unnorm'] and ('close' in c or 'open' in c or 'high' in c or 'low' in c or 'volume' in c or 'mom' in c or 'SMA' in c or 'EMA' in c or 'MACD' in c or 'ATR' in c or 'ROC' in c or 'Dist_VWAP' in c or 'HL_Spread' in c)]
+    cols_to_norm = [c for c in df_fused.columns if c not in ['sin_time', 'cos_time', 'sin_day', 'cos_day', 'close_unnorm', 'ATR_unnorm', 'Macro_Trend_60m'] and ('close' in c or 'open' in c or 'high' in c or 'low' in c or 'volume' in c or 'mom' in c or 'SMA' in c or 'EMA' in c or 'MACD' in c or 'ATR' in c or 'ROC' in c or 'Dist_VWAP' in c or 'HL_Spread' in c)]
     
     df_fused['date_only'] = df_fused.index.date
     # Ensure cols_to_norm actually exist, sometimes index issues might occur.

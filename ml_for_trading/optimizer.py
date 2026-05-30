@@ -68,7 +68,7 @@ def optimize_agent(trial):
             learning_rate=linear_schedule(3e-4), 
             ent_coef=0.05,
             gamma=gamma,
-            policy_kwargs=dict(net_arch=[hidden_dim, hidden_dim]),
+            policy_kwargs=dict(net_arch=dict(pi=[256, 128], vf=[256, 128])),
             verbose=0,
             seed=42,
             device="cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
@@ -122,7 +122,7 @@ if __name__ == "__main__":
         learning_rate=linear_schedule(3e-4),
         ent_coef=0.05,
         gamma=best_params["gamma"],
-        policy_kwargs=dict(net_arch=[best_params["hidden_dim"], best_params["hidden_dim"]]),
+        policy_kwargs=dict(net_arch=dict(pi=[256, 128], vf=[256, 128])),
         verbose=1,
         seed=42,
         device="cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
