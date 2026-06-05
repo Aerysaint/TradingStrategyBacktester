@@ -1,0 +1,651 @@
+diff --git a/ml_for_trading/__pycache__/data_processor.cpython-313.pyc b/ml_for_trading/__pycache__/data_processor.cpython-313.pyc
+deleted file mode 100644
+index 41f87f6..0000000
+Binary files a/ml_for_trading/__pycache__/data_processor.cpython-313.pyc and /dev/null differ
+diff --git a/ml_for_trading/__pycache__/label_generator.cpython-313.pyc b/ml_for_trading/__pycache__/label_generator.cpython-313.pyc
+deleted file mode 100644
+index ca2f2eb..0000000
+Binary files a/ml_for_trading/__pycache__/label_generator.cpython-313.pyc and /dev/null differ
+diff --git a/ml_for_trading/__pycache__/rl_env.cpython-313.pyc b/ml_for_trading/__pycache__/rl_env.cpython-313.pyc
+deleted file mode 100644
+index 8bab6df..0000000
+Binary files a/ml_for_trading/__pycache__/rl_env.cpython-313.pyc and /dev/null differ
+diff --git a/ml_for_trading/best_params.json b/ml_for_trading/best_params.json
+deleted file mode 100644
+index f1b375c..0000000
+--- a/ml_for_trading/best_params.json
++++ /dev/null
+@@ -1 +0,0 @@
+-{"seq_length": 54, "norm_window": 865, "atr_window": 13, "volatility_multiplier": 1.1767529623117097, "stop_loss_multiplier": 2.767812774929438, "gamma": 0.9372193748368579, "hidden_dim": 64, "horizon": 15}
+\ No newline at end of file
+diff --git a/ml_for_trading/data_processor.py b/ml_for_trading/data_processor.py
+deleted file mode 100644
+index 59c31ee..0000000
+--- a/ml_for_trading/data_processor.py
++++ /dev/null
+@@ -1,123 +0,0 @@
+-import pandas as pd
+-import numpy as np
+-import os
+-
+-def load_and_fuse_data(data_dir, norm_window, atr_window):
+-    """
+-    Loads 1m, 5m, 15m, 60m, 1d datasets and fuses them to the 5m index.
+-    """
+-    df_1m = pd.read_csv(os.path.join(data_dir, "NIFTY 50_minute.csv"))
+-    df_5m = pd.read_csv(os.path.join(data_dir, "NIFTY 50_5minute.csv"))
+-    df_15m = pd.read_csv(os.path.join(data_dir, "NIFTY 50_15minute.csv"))
+-    df_60m = pd.read_csv(os.path.join(data_dir, "NIFTY 50_60minute.csv"))
+-    df_1d = pd.read_csv(os.path.join(data_dir, "NIFTY 50_day.csv"))
+-
+-    def prep_df(df, prefix):
+-        df = df.copy()
+-        if 'date' in df.columns:
+-            df.rename(columns={'date': 'datetime'}, inplace=True)
+-        if 'datetime' not in df.columns:
+-            df.rename(columns={df.columns[0]: 'datetime'}, inplace=True)
+-        df['datetime'] = pd.to_datetime(df['datetime'])
+-        df = df.sort_values('datetime').drop_duplicates('datetime').set_index('datetime')
+-        if prefix:
+-            df = df.add_suffix(f'_{prefix}')
+-        return df
+-
+-    df_1m = prep_df(df_1m, '1m')
+-    df_5m = prep_df(df_5m, '')
+-    
+-    # Pre-compute Macro Trend on 60m data before shifting to prevent leakage
+-    df_60m = prep_df(df_60m, '60m')
+-    df_60m['SMA_60m'] = df_60m['close_60m'].rolling(window=14).mean()
+-    slope_60m = df_60m['SMA_60m'] - df_60m['SMA_60m'].shift(3)
+-    # Use rolling std for dynamic thresholds
+-    slope_std_60m = slope_60m.rolling(window=100).std().replace(0, 1e-8)
+-    df_60m['Macro_Trend_60m'] = np.where(slope_60m > slope_std_60m * 0.5, 1, np.where(slope_60m < -slope_std_60m * 0.5, -1, 0))
+-    df_60m.drop(columns=['SMA_60m'], inplace=True)
+-    
+-    # CRITICAL FIX for Data Leakage: Higher timeframe timestamps typically represent 
+-    # the start of the bar. To prevent the 09:15 5-min candle from seeing the 
+-    # 09:15-09:30 15-min closure, we explicitly shift the timeframe down by 1 completely 
+-    # sealing the "future" out of the present features.
+-    df_15m = prep_df(df_15m, '15m').shift(1)
+-    df_60m = df_60m.shift(1)
+-    df_1d = prep_df(df_1d, '1d').shift(1)
+-
+-    # Aggregate 1m to 5m (e.g., rolling 5-period momentum of close)
+-    df_1m_rolled = df_1m[['close_1m']].rolling(window=5).apply(lambda x: x.iloc[-1] / x.iloc[0] - 1, raw=False)
+-    df_1m_rolled.rename(columns={'close_1m': 'mom_1m_5p'}, inplace=True)
+-    df_1m_resampled = df_1m_rolled.reindex(df_5m.index, method='ffill')
+-
+-    # Forward fill higher timeframes
+-    df_15m_aligned = pd.merge_asof(df_5m[[]], df_15m, left_index=True, right_index=True, direction='backward')
+-    df_60m_aligned = pd.merge_asof(df_5m[[]], df_60m, left_index=True, right_index=True, direction='backward')
+-    df_1d_aligned = pd.merge_asof(df_5m[[]], df_1d, left_index=True, right_index=True, direction='backward')
+-
+-    # Merge all
+-    df_fused = df_5m.join([df_1m_resampled, df_15m_aligned, df_60m_aligned, df_1d_aligned], how='left')
+-
+-    # Cyclical Time Encoding
+-    df_fused['minute_of_day'] = df_fused.index.hour * 60 + df_fused.index.minute
+-    df_fused['day_of_week'] = df_fused.index.dayofweek
+-
+-    df_fused['sin_time'] = np.sin(2 * np.pi * df_fused['minute_of_day'] / (24 * 60))
+-    df_fused['cos_time'] = np.cos(2 * np.pi * df_fused['minute_of_day'] / (24 * 60))
+-    df_fused['sin_day'] = np.sin(2 * np.pi * df_fused['day_of_week'] / 5)
+-    df_fused['cos_day'] = np.cos(2 * np.pi * df_fused['day_of_week'] / 5)
+-    df_fused.drop(columns=['minute_of_day', 'day_of_week'], inplace=True)
+-
+-    # Dynamic Indicators on 5m
+-    def calculate_atr(df, window):
+-        high_low = df['high'] - df['low']
+-        high_close = np.abs(df['high'] - df['close'].shift())
+-        low_close = np.abs(df['low'] - df['close'].shift())
+-        ranges = pd.concat([high_low, high_close, low_close], axis=1)
+-        true_range = np.max(ranges, axis=1)
+-        return true_range.rolling(window).mean()
+-
+-    df_fused['SMA_5m'] = df_fused['close'].rolling(window=14).mean()
+-    df_fused['EMA_5m'] = df_fused['close'].ewm(span=14, adjust=False).mean()
+-    exp1 = df_fused['close'].ewm(span=12, adjust=False).mean()
+-    exp2 = df_fused['close'].ewm(span=26, adjust=False).mean()
+-    df_fused['MACD'] = exp1 - exp2
+-    df_fused['ATR'] = calculate_atr(df_fused, atr_window)
+-    
+-    # NEW FEATURES: Momentum & Volatility
+-    df_fused['ROC_3'] = df_fused['close'].pct_change(periods=3)
+-    df_fused['ROC_5'] = df_fused['close'].pct_change(periods=5)
+-    df_fused['ROC_10'] = df_fused['close'].pct_change(periods=10)
+-    
+-    df_fused['date_only'] = df_fused.index.date
+-    if 'volume' in df_fused.columns:
+-        # Distance from VWAP (VWAP resets daily)
+-        vwap_numer = df_fused.groupby('date_only').apply(lambda x: (x['close'] * x['volume']).cumsum()).reset_index(level=0, drop=True)
+-        vwap_denom = df_fused.groupby('date_only')['volume'].cumsum()
+-        vwap = vwap_numer / (vwap_denom + 1e-8)
+-        df_fused['Dist_VWAP'] = (df_fused['close'] - vwap) / (vwap + 1e-8)
+-    else:
+-        df_fused['Dist_VWAP'] = 0
+-        
+-    df_fused['HL_Spread'] = (df_fused['high'] - df_fused['low']).rolling(window=5).mean()
+-
+-    # Store unnormalized price and ATR for realistic PnL tracking in RL environment
+-    df_fused['close_unnorm'] = df_fused['close']
+-    df_fused['ATR_unnorm'] = df_fused['ATR']
+-
+-    # Dynamic Normalization (Z-score grouped by date to avoid overnight look-ahead)
+-    def normalize_group(group, window):
+-        mean = group.rolling(window=window, min_periods=1).mean()
+-        std = group.rolling(window=window, min_periods=1).std()
+-        std[std == 0] = 1e-8
+-        return (group - mean) / std
+-
+-    cols_to_norm = [c for c in df_fused.columns if c not in ['sin_time', 'cos_time', 'sin_day', 'cos_day', 'close_unnorm', 'ATR_unnorm', 'Macro_Trend_60m'] and ('close' in c or 'open' in c or 'high' in c or 'low' in c or 'volume' in c or 'mom' in c or 'SMA' in c or 'EMA' in c or 'MACD' in c or 'ATR' in c or 'ROC' in c or 'Dist_VWAP' in c or 'HL_Spread' in c)]
+-    
+-    df_fused['date_only'] = df_fused.index.date
+-    # Ensure cols_to_norm actually exist, sometimes index issues might occur.
+-    df_fused[cols_to_norm] = df_fused.groupby('date_only')[cols_to_norm].transform(lambda x: normalize_group(x, norm_window))
+-    df_fused.drop(columns=['date_only'], inplace=True)
+-
+-    df_fused.replace([np.inf, -np.inf], 0, inplace=True)
+-    df_fused.dropna(inplace=True)
+-    return df_fused
+diff --git a/ml_for_trading/dl_model.py b/ml_for_trading/dl_model.py
+deleted file mode 100644
+index e97f765..0000000
+--- a/ml_for_trading/dl_model.py
++++ /dev/null
+@@ -1,54 +0,0 @@
+-import torch
+-import torch.nn as nn
+-from torch.utils.data import Dataset
+-
+-class TimeSeriesDataset(Dataset):
+-    def __init__(self, data, labels, seq_length, device=None):
+-        if device is None:
+-            device = "cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
+-        self.data = torch.tensor(data.values, dtype=torch.float32).to(device)
+-        if labels is not None:
+-            self.labels = torch.tensor(labels.values, dtype=torch.long).to(device)
+-        else:
+-            self.labels = None
+-        self.seq_length = seq_length
+-        
+-    def __len__(self):
+-        return len(self.data) - self.seq_length
+-    
+-    def __getitem__(self, idx):
+-        x = self.data[idx : idx + self.seq_length]
+-        if self.labels is not None:
+-            y = self.labels[idx + self.seq_length - 1]
+-            return x, y
+-        return x
+-
+-class TradingLSTM(nn.Module):
+-    def __init__(self, input_dim, hidden_dim, num_layers, dropout, learning_rate=0.001):
+-        super(TradingLSTM, self).__init__()
+-        self.hidden_dim = hidden_dim
+-        self.num_layers = num_layers
+-        self.learning_rate = learning_rate
+-        self.lstm = nn.LSTM(input_dim, hidden_dim, num_layers, batch_first=True, dropout=dropout if num_layers > 1 else 0)
+-        self.dropout = nn.Dropout(dropout)
+-        self.fc = nn.Linear(hidden_dim, 3) # 3 classes: 0 (Hold), 1 (Buy), 2 (Sell)
+-        
+-    def forward(self, x):
+-        h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim).to(x.device)
+-        c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_dim).to(x.device)
+-        out, _ = self.lstm(x, (h0, c0))
+-        out = self.dropout(out[:, -1, :])
+-        out = self.fc(out)
+-        return out
+-    
+-    def predict_with_uncertainty(self, x, passes=50):
+-        self.train() # Enable dropout for MC Dropout
+-        predictions = []
+-        with torch.no_grad():
+-            for _ in range(passes):
+-                preds = self.forward(x)
+-                predictions.append(preds.unsqueeze(0))
+-        predictions = torch.cat(predictions, dim=0) # shape: (passes, batch, classes)
+-        mean_preds = predictions.mean(dim=0)
+-        variance_preds = predictions.var(dim=0).mean(dim=1) # epistemic uncertainty score
+-        return mean_preds, variance_preds
+diff --git a/ml_for_trading/inference.py b/ml_for_trading/inference.py
+deleted file mode 100644
+index 208fa1f..0000000
+--- a/ml_for_trading/inference.py
++++ /dev/null
+@@ -1,88 +0,0 @@
+-import os
+-import json
+-import torch
+-import numpy as np
+-from stable_baselines3 import PPO
+-from stable_baselines3.common.env_util import make_vec_env
+-
+-from data_processor import load_and_fuse_data
+-from label_generator import generate_labels
+-from rl_env import TradingEnv
+-
+-def run_inference():
+-    # Load the matching hyperparameters that were used to train the saved model
+-    params_path = os.path.join(os.path.dirname(__file__), 'best_params.json')
+-    if not os.path.exists(params_path):
+-        print(f"Hyperparameters file not found at {params_path}. Please run optimizer.py first.")
+-        return
+-        
+-    with open(params_path, 'r') as f:
+-        best_params = json.load(f)
+-
+-    print(f"Loading data for inference using parameters: {best_params}")
+-    data_dir = os.path.join(os.path.dirname(__file__), '..', 'datasets')
+-    df = load_and_fuse_data(data_dir, best_params["norm_window"], best_params["atr_window"])
+-    df = generate_labels(df, best_params["horizon"], best_params["volatility_multiplier"])
+-    
+-    # We create the environment exactly as we did in training
+-    inference_env_fn = lambda: TradingEnv(df, best_params["seq_length"], best_params["stop_loss_multiplier"])
+-    inference_env = make_vec_env(inference_env_fn, n_envs=1)
+-    
+-    model_path = os.path.join(os.path.dirname(__file__), 'best_trading_model.zip')
+-    if not os.path.exists(model_path):
+-        print(f"Model not found at {model_path}. Please run optimizer.py first to train and save the ultimate model.")
+-        return
+-
+-    print("Loading specialized model...")
+-    # Load model enforcing evaluation mode
+-    model = PPO.load(model_path, env=inference_env, device="cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu"))
+-    
+-    print("Running inference over the dataset...")
+-    obs = inference_env.reset()
+-    done = [False]
+-    
+-    actions_taken = []
+-    rewards_history = []
+-    
+-    # Walk through the dataset
+-    while not done[0]:
+-        # Standard deterministic prediction (argmax of probabilities) without threshold
+-        action, _states = model.predict(obs, deterministic=True)
+-                
+-        # We step the environment and unpack actual PnL
+-        obs, reward, done, info = inference_env.step(action)
+-        actual_pnl = info[0]['actual_pnl'] # Use true PnL tracked in the env's info dict
+-        
+-        actions_taken.append(action[0])
+-        rewards_history.append(actual_pnl)
+-        
+-    print("Inference full sweep complete.")
+-    
+-    cumulative_pnl = np.cumsum(rewards_history)
+-    total_pnl = cumulative_pnl[-1] if len(cumulative_pnl) > 0 else 0
+-    
+-    running_max = np.maximum.accumulate(cumulative_pnl)
+-    drawdowns = running_max - cumulative_pnl
+-    max_drawdown = drawdowns.max() if len(drawdowns) > 0 else 0
+-    
+-    # Track trade executions based on position changes
+-    mapped_actions = np.array([0 if a == 0 else (1 if a == 1 else -1) for a in actions_taken])
+-    position_changes = np.diff(mapped_actions, prepend=0)
+-    total_trades = np.count_nonzero(position_changes)
+-    
+-    print("\n" + "="*30)
+-    print("--- INFERENCE PNL REPORT ---")
+-    print("="*30)
+-    print(f"Total Cumulative PnL:  {total_pnl:,.2f} Index Points")
+-    print(f"Max Drawdown:         -{max_drawdown:,.2f} Index Points")
+-    print(f"Total Trades Executed: {total_trades}")
+-    print(f"Average PnL per Trade: {(total_pnl / total_trades) if total_trades > 0 else 0:,.2f} Index Points")
+-    print("-" * 30)
+-    print("Distribution of actions taken:")
+-    print(f"   Hold : {actions_taken.count(0)}")
+-    print(f"   Buy  : {actions_taken.count(1)}")
+-    print(f"   Sell : {actions_taken.count(2)}")
+-    print("="*30 + "\n")
+-
+-if __name__ == "__main__":
+-    run_inference()
+diff --git a/ml_for_trading/label_generator.py b/ml_for_trading/label_generator.py
+deleted file mode 100644
+index 7b290c4..0000000
+--- a/ml_for_trading/label_generator.py
++++ /dev/null
+@@ -1,42 +0,0 @@
+-import pandas as pd
+-import numpy as np
+-
+-def generate_labels(df, horizon, volatility_multiplier):
+-    """
+-    Generates class labels based on future return and rolling volatility bounds.
+-    Class 1 (Up/Buy): Future_Ret > (rolling_std * volatility_multiplier)
+-    Class 2 (Down/Sell): Future_Ret < -(rolling_std * volatility_multiplier)
+-    Class 0 (Flat/Hold): Between the bounds.
+-    """
+-    df_labelled = df.copy()
+-    
+-    # Calculate Future Return
+-    # Using 'close' since it wasn't normalized or using an un-normalized column would be better,
+-    # but the prompt says: "Calculate the future return: Future_Ret = (Close.shift(-horizon) - Close) / Close"
+-    # Assuming 'close' in df is available. If it was normalized, the return calculation might be skewed, 
+-    # but here we'll assume it works on the available 'close' column which might be normalized.
+-    # Actually, we should calculate labels before normalization or keep original close. 
+-    # For now, implemented as requested.
+-    
+-    df_labelled['Future_Ret'] = (df_labelled['close'].shift(-horizon) - df_labelled['close']) / df_labelled['close']
+-    
+-    # Calculate rolling std of returns
+-    df_labelled['rolling_std'] = df_labelled['close'].pct_change().rolling(window=horizon).std()
+-    
+-    # Dynamic Flat Zone Bounds
+-    upper_bound = df_labelled['rolling_std'] * volatility_multiplier
+-    lower_bound = -df_labelled['rolling_std'] * volatility_multiplier
+-    
+-    # Assign labels
+-    conditions = [
+-        (df_labelled['Future_Ret'] > upper_bound),
+-        (df_labelled['Future_Ret'] < lower_bound)
+-    ]
+-    choices = [1, 2] # 1 for Up, 2 for Down, 0 for Flat
+-    
+-    df_labelled['label'] = np.select(conditions, choices, default=0)
+-    
+-    # Drop NaNs created by shifts and rolling
+-    df_labelled.dropna(inplace=True)
+-    
+-    return df_labelled
+diff --git a/ml_for_trading/optimizer.py b/ml_for_trading/optimizer.py
+deleted file mode 100644
+index 34e9306..0000000
+--- a/ml_for_trading/optimizer.py
++++ /dev/null
+@@ -1,145 +0,0 @@
+-import optuna
+-import pandas as pd
+-import numpy as np
+-import os
+-from sklearn.model_selection import TimeSeriesSplit
+-from stable_baselines3 import PPO
+-from stable_baselines3.common.env_util import make_vec_env
+-import torch
+-from typing import Callable
+-
+-from data_processor import load_and_fuse_data
+-from label_generator import generate_labels
+-from rl_env import TradingEnv
+-
+-def linear_schedule(initial_value: float) -> Callable[[float], float]:
+-    """
+-    Linear learning rate schedule.
+-    :param initial_value: Initial learning rate.
+-    :return: schedule that computes current learning rate depending on remaining progress
+-    """
+-    def func(progress_remaining: float) -> float:
+-        return progress_remaining * initial_value
+-    return func
+-
+-def optimize_agent(trial):
+-    # 1. Sample hyperparameters
+-    seq_length = trial.suggest_int("seq_length", 10, 60)
+-    norm_window = trial.suggest_int("norm_window", 100, 1000)
+-    atr_window = trial.suggest_int("atr_window", 5, 30)
+-    volatility_multiplier = trial.suggest_float("volatility_multiplier", 0.5, 3.0)
+-    stop_loss_multiplier = trial.suggest_float("stop_loss_multiplier", 0.5, 3.0)
+-    gamma = trial.suggest_float("gamma", 0.90, 0.999) # Discount factor
+-    hidden_dim = trial.suggest_categorical("hidden_dim", [64, 128, 256])
+-    horizon = trial.suggest_int("horizon", 5, 20)
+-    
+-    # data_dir points to datasets relative to current folder
+-    data_dir = os.path.join(os.path.dirname(__file__), '..', 'datasets')
+-    
+-    # 2. Run data processor and label generator
+-    try:
+-        df = load_and_fuse_data(data_dir, norm_window, atr_window)
+-        df = generate_labels(df, horizon, volatility_multiplier)
+-    except Exception as e:
+-        return -np.inf
+-
+-    if len(df) < 1000:
+-        return -np.inf
+-
+-    # 3. Time Series Walk-Forward Splitter
+-    tscv = TimeSeriesSplit(n_splits=3)
+-    val_sharpes = []
+-    
+-    for train_index, val_index in tscv.split(df):
+-        train_df = df.iloc[train_index]
+-        val_df = df.iloc[val_index]
+-        
+-        if len(train_df) < seq_length or len(val_df) < seq_length:
+-            continue
+-            
+-        # 4. Train RL agent (PPO) 
+-        # Using MlpPolicy but using flattened seq_length * features input natively from TradingEnv
+-        train_env_fn = lambda: TradingEnv(train_df, seq_length, stop_loss_multiplier, total_training_steps=10000)
+-        train_env = make_vec_env(train_env_fn, n_envs=1)
+-        
+-        model = PPO(
+-            "MlpPolicy", 
+-            train_env, 
+-            learning_rate=linear_schedule(3e-4), 
+-            ent_coef=0.05,
+-            gamma=gamma,
+-            policy_kwargs=dict(net_arch=dict(pi=[256, 128], vf=[256, 128])),
+-            verbose=0,
+-            seed=42,
+-            device="cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
+-        )
+-        
+-        model.learn(total_timesteps=10000) # Fast train for tuning
+-        
+-        # 5. Evaluate on Validation folds based on Sharpe Ratio
+-        val_env = TradingEnv(val_df, seq_length, stop_loss_multiplier)
+-        obs, _ = val_env.reset()
+-        done = False
+-        rewards = []
+-        
+-        while not done:
+-            action, _states = model.predict(obs, deterministic=True)
+-            obs, reward, done, truncated, info = val_env.step(action)
+-            rewards.append(reward)
+-            
+-        if len(rewards) > 0 and np.std(rewards) > 0:
+-            # Approx daily sharpe assuming 5m freq (75 periods per day avg for India equities)
+-            sharpe = np.sqrt(75) * np.mean(rewards) / np.std(rewards)
+-        else:
+-            sharpe = -np.inf
+-            
+-        val_sharpes.append(sharpe)
+-        
+-    if not val_sharpes:
+-        return -np.inf
+-        
+-    return np.mean(val_sharpes)
+-
+-if __name__ == "__main__":
+-    study = optuna.create_study(direction="maximize")
+-    study.optimize(optimize_agent, n_trials=5) # Can be increased by user
+-    print("Best hyperparameters:", study.best_params)
+-    
+-    # Train final model on the full dataset using the best hyperparameters
+-    print("\nTraining final model with best hyperparameters on the entire dataset...")
+-    best_params = study.best_params
+-    
+-    data_dir = os.path.join(os.path.dirname(__file__), '..', 'datasets')
+-    df = load_and_fuse_data(data_dir, best_params["norm_window"], best_params["atr_window"])
+-    df = generate_labels(df, best_params["horizon"], best_params["volatility_multiplier"])
+-    
+-    final_env_fn = lambda: TradingEnv(df, best_params["seq_length"], best_params["stop_loss_multiplier"], total_training_steps=50000)
+-    final_env = make_vec_env(final_env_fn, n_envs=1)
+-    
+-    final_model = PPO(
+-        "MlpPolicy", 
+-        final_env, 
+-        learning_rate=linear_schedule(3e-4),
+-        ent_coef=0.05,
+-        gamma=best_params["gamma"],
+-        policy_kwargs=dict(net_arch=dict(pi=[256, 128], vf=[256, 128])),
+-        verbose=1,
+-        seed=42,
+-        device="cuda" if torch.cuda.is_available() else ("mps" if torch.backends.mps.is_available() else "cpu")
+-    )
+-    
+-    # Train for more timesteps to ensure convergence on the full dataset
+-    final_model.learn(total_timesteps=50000)
+-    
+-    # Save the model
+-    model_path = os.path.join(os.path.dirname(__file__), 'best_trading_model')
+-    final_model.save(model_path)
+-    
+-    # Save the best parameters to a JSON file so inference can use the exact matching shapes
+-    import json
+-    params_path = os.path.join(os.path.dirname(__file__), 'best_params.json')
+-    with open(params_path, 'w') as f:
+-        json.dump(best_params, f)
+-        
+-    print(f"\nModel saved successfully to: {model_path}.zip")
+-
+diff --git a/ml_for_trading/rl_env.py b/ml_for_trading/rl_env.py
+deleted file mode 100644
+index a0fa8e2..0000000
+--- a/ml_for_trading/rl_env.py
++++ /dev/null
+@@ -1,143 +0,0 @@
+-import gymnasium as gym
+-from gymnasium import spaces
+-import numpy as np
+-from collections import deque
+-
+-class TradingEnv(gym.Env):
+-    def __init__(self, df, seq_length, stop_loss_multiplier, transaction_cost=2.5, total_training_steps=50000):
+-        super(TradingEnv, self).__init__()
+-        self.df = df.reset_index(drop=True)
+-        self.seq_length = seq_length # Represents window_size for frame stacking
+-        self.stop_loss_multiplier = stop_loss_multiplier
+-        self.max_transaction_cost = transaction_cost # Absolute Index Points penalty per side
+-        self.total_training_steps = total_training_steps
+-        self.global_step = 0
+-        
+-        # Assuming df has 'close_unnorm' for actual PnL tracking 
+-        # and 'ATR_unnorm' for dynamic SL in actual price points.
+-        # If not, we fall back to 'close' and 'ATR'.
+-        price_col = 'close_unnorm' if 'close_unnorm' in self.df.columns else 'close'
+-        atr_col = 'ATR_unnorm' if 'ATR_unnorm' in self.df.columns else 'ATR'
+-        
+-        self.prices = self.df[price_col].values
+-        self.atrs = self.df[atr_col].values
+-        
+-        self.feature_cols = [c for c in self.df.columns if c not in ['label', 'Future_Ret', 'rolling_std', price_col, atr_col]]
+-        self.features = self.df[self.feature_cols].values
+-        
+-        # State space: flattened array of the last N steps (Frame Stacking)
+-        self.observation_space = spaces.Box(
+-            low=-np.inf, high=np.inf, 
+-            shape=(self.seq_length * len(self.feature_cols),), dtype=np.float32
+-        )
+-        
+-        self.action_space = spaces.Discrete(3) # 0: Hold/Flat, 1: Buy/Long, 2: Sell/Short
+-        
+-        self.frames = deque(maxlen=self.seq_length)
+-        self.current_step = self.seq_length
+-        self.position = 0 # 1 for Long, -1 for Short, 0 for Flat
+-        self.entry_price = 0
+-        self.flat_duration = 0
+-        self.done = False
+-        
+-    def reset(self, seed=None, options=None):
+-        super().reset(seed=seed)
+-        self.current_step = self.seq_length
+-        self.position = 0
+-        self.entry_price = 0
+-        self.flat_duration = 0
+-        self.done = False
+-        
+-        # Pre-fill the frame stack
+-        for i in range(self.seq_length):
+-            self.frames.append(self.features[i])
+-            
+-        return self._next_observation(), {}
+-        
+-    def _next_observation(self):
+-        obs = np.array(self.frames).flatten()
+-        return obs.astype(np.float32)
+-        
+-    def step(self, action):
+-        if self.done:
+-            return self._next_observation(), 0, self.done, False, {}
+-            
+-        self.global_step += 1
+-        
+-        # Append the incoming new feature step to frame stack
+-        self.frames.append(self.features[self.current_step])
+-        
+-        # Curriculum Learning: Scale transaction costs dynamically from 0 to full fee at 50% training
+-        current_fee = self.max_transaction_cost * min(1.0, self.global_step / max(1, self.total_training_steps * 0.5))
+-            
+-        current_price = self.prices[self.current_step]
+-        current_atr = self.atrs[self.current_step]
+-        step_reward = 0
+-        
+-        # Target Position Action Space: 0 -> Target Flat, 1 -> Target Long (+1), 2 -> Target Short (-1)
+-        target_position = 0 if action == 0 else (1 if action == 1 else -1)
+-        
+-        # Dynamic Risk Management: Stop Loss
+-        forced_close = False
+-        actual_pnl = 0
+-        
+-        if self.position != 0:
+-            unrealized_pnl = (current_price - self.entry_price) if self.position == 1 else (self.entry_price - current_price)
+-            stop_loss_threshold = self.stop_loss_multiplier * current_atr
+-            
+-            if unrealized_pnl < -stop_loss_threshold: # Hit stop loss
+-                forced_close = True
+-                actual_pnl += unrealized_pnl - current_fee
+-                step_reward += unrealized_pnl - current_fee
+-                self.position = 0
+-                self.entry_price = 0
+-                
+-        # Execute orders and Mark-to-Market
+-        if not forced_close:
+-            # 1. Execute Position Change (Pay transaction fee if moving)
+-            if target_position != self.position:
+-                # Whipsaw Penalty Rule: Punish instantaneous flips (+1 to -1 or -1 to +1)
+-                if (self.position == 1 and target_position == -1) or (self.position == -1 and target_position == 1):
+-                    step_reward -= 2.0 # Extra static mathematical punishment for erratic flips
+-                
+-                # If closing an existing position, we pay a fee.
+-                if self.position != 0:
+-                    actual_pnl -= current_fee
+-                    step_reward -= current_fee
+-                
+-                # If opening a new position, we pay a fee.
+-                if target_position != 0:
+-                    actual_pnl -= current_fee
+-                    step_reward -= current_fee
+-                    self.entry_price = current_price
+-                    
+-                self.position = target_position
+-                
+-            # 2. Mark-to-Market Step Reward (per step PnL change)
+-            price_change = self.prices[self.current_step] - self.prices[self.current_step - 1]
+-            if self.position == 1:
+-                step_reward += price_change
+-                actual_pnl += price_change
+-            elif self.position == -1:
+-                step_reward -= price_change
+-                actual_pnl -= price_change
+-        
+-        # Flat penalty to avoid 100% hold convergence
+-        if self.position == 0:
+-            self.flat_duration += 1
+-        else:
+-            self.flat_duration = 0
+-            
+-        if self.flat_duration > 50:
+-            step_reward -= 0.1
+-                
+-        self.current_step += 1
+-        if self.current_step >= len(self.df) - 1:
+-            self.done = True
+-            
+-        # Reward Normalization & Clipping
+-        step_reward = step_reward / (current_atr + 1e-8)
+-        step_reward = float(np.clip(step_reward, -15.0, 15.0))
+-            
+-        info = {'actual_pnl': float(actual_pnl)}
+-        return self._next_observation(), step_reward, self.done, False, info

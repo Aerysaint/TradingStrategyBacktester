@@ -1,0 +1,523 @@
+2026-06-05 13:44:51,169 INFO    MainThread:91880 [wandb_setup.py:_flush():81] Current SDK version is 0.27.1
+2026-06-05 13:44:51,169 INFO    MainThread:91880 [wandb_setup.py:_flush():81] Configure stats pid to 91880
+2026-06-05 13:44:51,170 INFO    MainThread:91880 [wandb_setup.py:_flush():81] Loading settings from environment variables
+2026-06-05 13:44:51,170 INFO    MainThread:91880 [wandb_init.py:setup_run_log_directory():723] Logging user logs to C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\wandb\run-20260605_134451-z8wbl55g\logs\debug.log
+2026-06-05 13:44:51,170 INFO    MainThread:91880 [wandb_init.py:setup_run_log_directory():724] Logging internal logs to C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\wandb\run-20260605_134451-z8wbl55g\logs\debug-internal.log
+2026-06-05 13:44:51,181 INFO    MainThread:91880 [wandb_init.py:init():766] calling init triggers
+2026-06-05 13:44:51,182 INFO    MainThread:91880 [wandb_init.py:init():771] wandb.init called with sweep_config: {}
+config: {'INITIAL_BALANCE': 100000.0, 'TRANSACTION_FEE_PCT': 0.0005, 'SLIPPAGE_MAX_TICKS': 2, 'LATENCY_MINUTES': 1, 'THETA_DECAY_COEFF': 0.01, 'WINDOW_SIZE': 30, 'RUIN_THRESHOLD': 0.8, '_wandb': {'code_path': 'code/quant_rl_framework/train.py'}}
+2026-06-05 13:44:51,182 INFO    MainThread:91880 [wandb_init.py:init():814] starting backend
+2026-06-05 13:44:51,182 INFO    MainThread:91880 [wandb_init.py:init():829] sending inform_init request
+2026-06-05 13:44:55,579 INFO    MainThread:91880 [wandb_init.py:init():834] backend started and connected
+2026-06-05 13:44:55,766 INFO    MainThread:91880 [wandb_init.py:init():904] updated telemetry
+2026-06-05 13:44:55,803 INFO    MainThread:91880 [wandb_init.py:init():927] communicating run to backend with 90.0 second timeout
+2026-06-05 13:44:56,365 INFO    MainThread:91880 [wandb_init.py:init():972] starting run threads in backend
+2026-06-05 13:44:56,932 INFO    MainThread:91880 [wandb_run.py:_console_start():2509] atexit reg
+2026-06-05 13:44:56,932 INFO    MainThread:91880 [wandb_run.py:_redirect():2359] redirect: wrap_raw
+2026-06-05 13:44:56,932 INFO    MainThread:91880 [wandb_run.py:_redirect():2428] Wrapping output streams.
+2026-06-05 13:44:56,932 INFO    MainThread:91880 [wandb_run.py:_redirect():2451] Redirects installed.
+2026-06-05 13:44:56,941 INFO    MainThread:91880 [wandb_init.py:init():1010] run started, returning control to user process
+2026-06-05 13:45:30,812 INFO    MainThread:91880 [wandb_run.py:_tensorboard_callback():1560] tensorboard callback: runs/z8wbl55g\RecurrentPPO_1, True
+2026-06-05 13:45:30,931 INFO    MainThread:91880 [wandb_run.py:_config_callback():1332] config_cb None None {'algo': 'RecurrentPPO', 'policy_class': "<class 'sb3_contrib.common.recurrent.policies.RecurrentActorCriticPolicy'>", 'device': 'cuda', 'verbose': 1, 'policy_kwargs': "{'lstm_hidden_size': 64, 'n_lstm_layers': 1}", 'num_timesteps': 0, '_total_timesteps': 100000, '_num_timesteps_at_start': 0, 'seed': 'None', 'action_noise': 'None', 'start_time': 1780647330789490300, 'learning_rate': 0.0003, 'tensorboard_log': 'runs/z8wbl55g', '_last_obs': '[[[-0.2103877   1.4228116  -2.0125797   0.          0.        ]\n  [-0.5150153   1.1299561  -2.0719562   0.          0.        ]\n  [-1.3771396   0.7090666  -1.7273686   0.          0.        ]\n  ...\n  [-1.0891412   0.5185943  -0.9817434   0.          0.        ]\n  [-0.44361922  0.35298073 -0.93051934  0.          0.        ]\n  [-0.83508724  0.13056621 -0.77728647  0.          0.        ]]\n\n [[-0.2103877   1.4228116  -2.0125797   0.          0.        ]\n  [-0.5150153   1.1299561  -2.0719562   0.          0.        ]\n  [-1.3771396   0.7090666  -1.7273686   0.          0.        ]\n  ...\n  [-1.0891412   0.5185943  -0.9817434   0.          0.        ]\n  [-0.44361922  0.35298073 -0.93051934  0.          0.        ]\n  [-0.83508724  0.13056621 -0.77728647  0.          0.        ]]\n\n [[-0.2103877   1.4228116  -2.0125797   0.          0.        ]\n  [-0.5150153   1.1299561  -2.0719562   0.          0.        ]\n  [-1.3771396   0.7090666  -1.7273686   0.          0.        ]\n  ...\n  [-1.0891412   0.5185943  -0.9817434   0.          0.        ]\n  [-0.44361922  0.35298073 -0.93051934  0.          0.        ]\n  [-0.83508724  0.13056621 -0.77728647  0.          0.        ]]\n\n ...\n\n [[-0.2103877   1.4228116  -2.0125797   0.          0.        ]\n  [-0.5150153   1.1299561  -2.0719562   0.          0.        ]\n  [-1.3771396   0.7090666  -1.7273686   0.          0.        ]\n  ...\n  [-1.0891412   0.5185943  -0.9817434   0.          0.        ]\n  [-0.44361922  0.35298073 -0.93051934  0.          0.        ]\n  [-0.83508724  0.13056621 -0.77728647  0.          0.        ]]\n\n [[-0.2103877   1.4228116  -2.0125797   0.          0.        ]\n  [-0.5150153   1.1299561  -2.0719562   0.          0.        ]\n  [-1.3771396   0.7090666  -1.7273686   0.          0.        ]\n  ...\n  [-1.0891412   0.5185943  -0.9817434   0.          0.        ]\n  [-0.44361922  0.35298073 -0.93051934  0.          0.        ]\n  [-0.83508724  0.13056621 -0.77728647  0.          0.        ]]\n\n [[-0.2103877   1.4228116  -2.0125797   0.          0.        ]\n  [-0.5150153   1.1299561  -2.0719562   0.          0.        ]\n  [-1.3771396   0.7090666  -1.7273686   0.          0.        ]\n  ...\n  [-1.0891412   0.5185943  -0.9817434   0.          0.        ]\n  [-0.44361922  0.35298073 -0.93051934  0.          0.        ]\n  [-0.83508724  0.13056621 -0.77728647  0.          0.        ]]]', '_last_episode_starts': '[ True  True  True  True  True  True  True  True  True  True  True  True\n  True  True  True  True  True  True  True  True  True  True  True  True]', '_last_original_obs': 'None', '_episode_num': 0, 'use_sde': 'False', 'sde_sample_freq': -1, '_current_progress_remaining': 1.0, '_stats_window_size': 100, 'ep_info_buffer': 'deque([], maxlen=100)', 'ep_success_buffer': 'deque([], maxlen=100)', '_n_updates': 0, '_custom_logger': 'False', 'env': '<stable_baselines3.common.vec_env.subproc_vec_env.SubprocVecEnv object at 0x0000022EEB319160>', '_vec_normalize_env': 'None', 'observation_space': 'Box(-inf, inf, (30, 5), float32)', 'action_space': 'Discrete(3)', 'n_envs': 24, 'n_steps': 2048, 'gamma': 0.99, 'gae_lambda': 0.95, 'ent_coef': 0.0, 'vf_coef': 0.5, 'max_grad_norm': 0.5, 'rollout_buffer_class': 'None', 'rollout_buffer_kwargs': '{}', 'batch_size': 64, 'n_epochs': 10, 'clip_range': 'FloatSchedule(ConstantSchedule(val=0.2))', 'clip_range_vf': 'None', 'normalize_advantage': 'True', 'target_kl': 'None', '_last_lstm_states': "RNNStates(pi=(tensor([[[0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         ...,\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.]]], device='cuda:0'), tensor([[[0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         ...,\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.]]], device='cuda:0')), vf=(tensor([[[0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         ...,\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.]]], device='cuda:0'), tensor([[[0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         ...,\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.],\n         [0., 0., 0.,  ..., 0., 0., 0.]]], device='cuda:0')))", 'lr_schedule': 'FloatSchedule(ConstantSchedule(val=0.0003))', 'policy': 'RecurrentActorCriticPolicy(\n  (features_extractor): FlattenExtractor(\n    (flatten): Flatten(start_dim=1, end_dim=-1)\n  )\n  (pi_features_extractor): FlattenExtractor(\n    (flatten): Flatten(start_dim=1, end_dim=-1)\n  )\n  (vf_features_extractor): FlattenExtractor(\n    (flatten): Flatten(start_dim=1, end_dim=-1)\n  )\n  (mlp_extractor): MlpExtractor(\n    (policy_net): Sequential(\n      (0): Linear(in_features=64, out_features=64, bias=True)\n      (1): Tanh()\n      (2): Linear(in_features=64, out_features=64, bias=True)\n      (3): Tanh()\n    )\n    (value_net): Sequential(\n      (0): Linear(in_features=64, out_features=64, bias=True)\n      (1): Tanh()\n      (2): Linear(in_features=64, out_features=64, bias=True)\n      (3): Tanh()\n    )\n  )\n  (action_net): Linear(in_features=64, out_features=3, bias=True)\n  (value_net): Linear(in_features=64, out_features=1, bias=True)\n  (lstm_actor): LSTM(150, 64)\n  (lstm_critic): LSTM(150, 64)\n)', 'rollout_buffer': '<sb3_contrib.common.recurrent.buffers.RecurrentRolloutBuffer object at 0x0000022EEB647230>', '_logger': '<stable_baselines3.common.logger.Logger object at 0x0000022E8B3DC590>'}
+2026-06-05 13:56:16,720 INFO    wandb-AsyncioManager-main:91880 [service_client.py:_forward_responses():122] [no run ID] Reached EOF.
+2026-06-05 13:56:16,720 INFO    wandb-AsyncioManager-main:91880 [mailbox.py:close():154] [no run ID] Closing mailbox, abandoning 2 handles.
+2026-06-05 13:56:16,721 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\run_messages.py", line 90, in loop
+    await asyncio_compat.race(
+    ...<2 lines>...
+    )
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_compat.py", line 279, in race
+    async with open_task_group(race=True) as tg:
+               ~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\contextlib.py", line 221, in __aexit__
+    await anext(self.gen)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_compat.py", line 241, in open_task_group
+    await task_group._wait_all(race=race, timeout=exit_timeout)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_compat.py", line 181, in _wait_all
+    raise exc
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\run_messages.py", line 113, in _print_all
+    result = await handle.wait_async(timeout=None)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\mailbox\mailbox_handle.py", line 127, in wait_async
+    response = await self._handle.wait_async(timeout=timeout)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\mailbox\response_handle.py", line 123, in wait_async
+    raise HandleAbandonedError()
+wandb.sdk.mailbox.mailbox_handle.HandleAbandonedError
+2026-06-05 13:56:19,809 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,820 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,820 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,821 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,822 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,823 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,824 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,825 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,825 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,826 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,827 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,827 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,828 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,830 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,830 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,831 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,832 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,832 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,833 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,833 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,834 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,834 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,835 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,835 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,836 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,836 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,837 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost
+2026-06-05 13:56:19,837 ERROR   wandb-AsyncioManager-main:91880 [asyncio_manager.py:fn_wrap_exceptions():184] Uncaught exception in run_soon callback.
+Traceback (most recent call last):
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\asyncio_manager.py", line 182, in fn_wrap_exceptions
+    await fn()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 42, in publish
+    await self._send_server_request(request)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 75, in _send_server_request
+    raise self._broken_exc.with_traceback(self._broken_tb)
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 84, in _send_server_request
+    await self._drain_writer()
+  File "C:\Users\tejas\OneDrive\Desktop\TradingStrategyBacktester\.venv\Lib\site-packages\wandb\sdk\lib\service\service_client.py", line 92, in _drain_writer
+    await self._writer.drain()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 386, in drain
+    await self._protocol._drain_helper()
+  File "C:\Users\tejas\AppData\Roaming\uv\python\cpython-3.13-windows-x86_64-none\Lib\asyncio\streams.py", line 166, in _drain_helper
+    raise ConnectionResetError('Connection lost')
+ConnectionResetError: Connection lost

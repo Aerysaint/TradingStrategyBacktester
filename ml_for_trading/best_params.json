@@ -1,1 +1,0 @@
-{"seq_length": 54, "norm_window": 865, "atr_window": 13, "volatility_multiplier": 1.1767529623117097, "stop_loss_multiplier": 2.767812774929438, "gamma": 0.9372193748368579, "hidden_dim": 64, "horizon": 15}
