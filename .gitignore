@@ -3,3 +3,4 @@ backend/__pycache__
 backend/market_data.duckdb
 .venv
 ml_for_trading/best_trading_model.zip
+wandb
