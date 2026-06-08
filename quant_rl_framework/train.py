@@ -16,11 +16,11 @@ from trading_env import OptionsProxyEnv
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def make_env(csv_path: str, config: TradingConfig):
+import pandas as pd
+
+def make_env(df: pd.DataFrame, config: TradingConfig):
     def _init():
-        pipeline = MarketDataPipeline(csv_path, config)
-        df = pipeline.build_features()
-        df = pipeline.generate_rolling_scaling(df)
+        # Pass the pre-computed DataFrame instead of calculating it every process
         env = OptionsProxyEnv(df, config)
         env = Monitor(env)
         return env
@@ -29,6 +29,14 @@ def make_env(csv_path: str, config: TradingConfig):
 def main():
     config = TradingConfig()
     dataset_path = os.path.join(os.getcwd(), "datasets", "NIFTY 50_minute.csv")
+    
+    # Pre-compute data ONCE in the main process to prevent Windows OS RAM thrashing.
+    # Otherwise, Windows `spawn` architecture will recalculate and duplicate this 
+    # dataset per CPU core, blowing out 100% of System RAM and dropping CPU to <15%.
+    logger.info("Pre-computing global feature pipeline...")
+    pipeline = MarketDataPipeline(dataset_path, config)
+    df = pipeline.build_features()
+    df = pipeline.generate_rolling_scaling(df)
     
     # Initialize Weights & Biases
     run = wandb.init(
@@ -39,9 +47,12 @@ def main():
         save_code=True,
     )
     
-    num_envs = multiprocessing.cpu_count()
-    env = SubprocVecEnv([make_env(dataset_path, config) for _ in range(num_envs)])
-    eval_env = DummyVecEnv([make_env(dataset_path, config)])
+    # Cap CPU cores to prevent pipe deadlocks and memory starvation on Windows
+    num_envs = min(multiprocessing.cpu_count(), 4)
+    logger.info(f"Vectorizing {num_envs} CPU parallel environments...")
+    
+    env = SubprocVecEnv([make_env(df, config) for _ in range(num_envs)])
+    eval_env = DummyVecEnv([make_env(df, config)])
     
     eval_callback = EvalCallback(
         eval_env,

@@ -88,34 +88,50 @@ class OptionsProxyEnv(gym.Env):
             
         # State transitions
         just_entered = False
-        if action != self.position:
-            # Calculate execution price with slippage (worse price for the action)
-            if action == 1 or (self.position == 2 and action == 0): # Buying
+        trade_executed = False
+        new_position = self.position
+
+        # Action 0: Hold
+        # Action 1: Buy
+        # Action 2: Sell
+        if action == 1:
+            if self.position == 0:
+                new_position = 1 # Enter Long
+                trade_executed = True
+                just_entered = True
+            elif self.position == 2:
+                new_position = 0 # Exit Short
+                trade_executed = True
+        elif action == 2:
+            if self.position == 0:
+                new_position = 2 # Enter Short
+                trade_executed = True
+                just_entered = True
+            elif self.position == 1:
+                new_position = 0 # Exit Long
+                trade_executed = True
+
+        if trade_executed:
+            if action == 1: # Buying
                 p_exec = market_exec_price + slippage_amt
-            elif action == 2 or (self.position == 1 and action == 0): # Selling
+            else: # Selling
                 p_exec = market_exec_price - slippage_amt
-            else:
-                p_exec = market_exec_price
                 
-            # If we had a position, we are closing it or reversing
-            if self.position != 0:
-                fee += p_exec * self.config.TRANSACTION_FEE_PCT
-                
-            # Entering new position
-            if action != 0:
-                fee += p_exec * self.config.TRANSACTION_FEE_PCT
+            fee += p_exec * self.config.TRANSACTION_FEE_PCT
+            
+            if just_entered:
                 self.entry_price = p_exec
                 self.minutes_in_position = 0
-                just_entered = True
             
-            self.position = action
+            self.position = new_position
             
         # Holding penalty
         penalty = 0.0
         if self.position != 0:
             if not just_entered:
                 self.minutes_in_position += 1
-            penalty = self.config.THETA_DECAY_COEFF * (self.minutes_in_position ** 2)
+            # Linear theta decay: constant penalty per minute held
+            penalty = self.config.THETA_DECAY_COEFF
             
         total_step_reward = step_reward - fee - penalty
         self.balance += total_step_reward

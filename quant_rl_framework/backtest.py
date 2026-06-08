@@ -41,6 +41,9 @@ class Backtester:
             action, lstm_states = self.model.predict(obs, state=lstm_states, deterministic=True)
             obs, reward, done, truncated, info = self.env.step(action)
             
+            if 'balance' not in info:
+                break
+                
             step_data = {
                 'timestamp': self.env.df['timestamp'].iloc[self.env.current_step],
                 'close': self.env.df['close'].iloc[self.env.current_step],
@@ -95,9 +98,9 @@ class Backtester:
         ), row=1, col=1)
         
         # Actions markers
-        long_entries = history_df[(history_df['action'] == 1) & (history_df['action'].shift(1) != 1)]
-        short_entries = history_df[(history_df['action'] == 2) & (history_df['action'].shift(1) != 2)]
-        exits = history_df[(history_df['action'] == 0) & (history_df['action'].shift(1) != 0)]
+        long_entries = history_df[(history_df['position'] == 1) & (history_df['position'].shift(1).fillna(0) == 0)]
+        short_entries = history_df[(history_df['position'] == 2) & (history_df['position'].shift(1).fillna(0) == 0)]
+        exits = history_df[(history_df['position'] == 0) & (history_df['position'].shift(1).fillna(0) != 0)]
         
         fig.add_trace(plotly_go.Scatter(
             x=long_entries['timestamp'], y=long_entries['close'],
