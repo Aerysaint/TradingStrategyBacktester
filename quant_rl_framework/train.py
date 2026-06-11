@@ -18,9 +18,15 @@ logger = logging.getLogger(__name__)
 
 import pandas as pd
 
-def make_env(df: pd.DataFrame, config: TradingConfig):
+import torch
+
+def make_env(dataset_path: str, config: TradingConfig):
     def _init():
-        # Pass the pre-computed DataFrame instead of calculating it every process
+        # Build features INSIDE the spawned process to avoid Windows IPC pipe deadlocks
+        pipeline = MarketDataPipeline(dataset_path, config)
+        df = pipeline.build_features()
+        df = pipeline.generate_rolling_scaling(df)
+        
         env = OptionsProxyEnv(df, config)
         env = Monitor(env)
         return env
@@ -29,14 +35,6 @@ def make_env(df: pd.DataFrame, config: TradingConfig):
 def main():
     config = TradingConfig()
     dataset_path = os.path.join(os.getcwd(), "datasets", "NIFTY 50_minute.csv")
-    
-    # Pre-compute data ONCE in the main process to prevent Windows OS RAM thrashing.
-    # Otherwise, Windows `spawn` architecture will recalculate and duplicate this 
-    # dataset per CPU core, blowing out 100% of System RAM and dropping CPU to <15%.
-    logger.info("Pre-computing global feature pipeline...")
-    pipeline = MarketDataPipeline(dataset_path, config)
-    df = pipeline.build_features()
-    df = pipeline.generate_rolling_scaling(df)
     
     # Initialize Weights & Biases
     run = wandb.init(
@@ -47,18 +45,26 @@ def main():
         save_code=True,
     )
     
-    # Cap CPU cores to prevent pipe deadlocks and memory starvation on Windows
+    # Cap CPU cores
     num_envs = min(multiprocessing.cpu_count(), 4)
-    logger.info(f"Vectorizing {num_envs} CPU parallel environments...")
     
-    env = SubprocVecEnv([make_env(df, config) for _ in range(num_envs)])
-    eval_env = DummyVecEnv([make_env(df, config)])
+    import sys
+    if sys.platform == "win32":
+        logger.info(f"Windows detected: Vectorizing {num_envs} CPU environments using DummyVecEnv to prevent IPC pipe deadlocks...")
+        env = DummyVecEnv([make_env(dataset_path, config) for _ in range(num_envs)])
+    else:
+        logger.info(f"Vectorizing {num_envs} CPU parallel environments using SubprocVecEnv...")
+        env = SubprocVecEnv([make_env(dataset_path, config) for _ in range(num_envs)])
+    
+    # Eval env
+    eval_env = DummyVecEnv([make_env(dataset_path, config)])
     
     eval_callback = EvalCallback(
         eval_env,
         best_model_save_path=f'./models/{run.id}/',
         log_path=f'./logs/{run.id}/',
-        eval_freq=5000,
+        eval_freq=50000,
+        n_eval_episodes=1,
         deterministic=True,
         render=False
     )
@@ -70,8 +76,10 @@ def main():
     
     callback_list = CallbackList([eval_callback, wandb_callback])
     
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    logger.info(f"Using device: {device}")
+    
     try:
-        # We must use RecurrentPPO for MlpLstmPolicy
         from sb3_contrib import RecurrentPPO
         model = RecurrentPPO(
             "MlpLstmPolicy",
@@ -83,6 +91,7 @@ def main():
             gamma=0.99,
             gae_lambda=0.95,
             verbose=1,
+            device=device,
             tensorboard_log=f"runs/{run.id}",
             policy_kwargs=dict(lstm_hidden_size=64, n_lstm_layers=1)
         )
@@ -91,7 +100,7 @@ def main():
         raise
 
     logger.info("Starting training...")
-    model.learn(total_timesteps=100000, callback=callback_list)
+    model.learn(total_timesteps=3000000, callback=callback_list)
     
     model.save("ppo_trading_model")
     run.finish()

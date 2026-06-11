@@ -34,13 +34,28 @@ class OptionsProxyEnv(gym.Env):
         self.minutes_in_position = 0
         self.entry_price = 0.0
         
+        # Pre-allocate numpy arrays for 100x speedup over pandas .iloc
+        self._features_arr = self.df[self.feature_cols].values
+        self._close_arr = self.df['close'].values
+        if 'timestamp' in self.df.columns:
+            self._is_new_day_arr = (self.df['timestamp'].dt.date != self.df['timestamp'].shift(1).dt.date).values
+        else:
+            self._is_new_day_arr = np.zeros(len(self.df), dtype=bool)
+
     def reset(self, seed=None, options=None) -> Tuple[np.ndarray, dict]:
         super().reset(seed=seed)
         self.balance = self.config.INITIAL_BALANCE
         self.position = 0
         self.minutes_in_position = 0
         self.entry_price = 0.0
-        self.current_step = self.config.WINDOW_SIZE
+        
+        max_start = len(self.df) - self.config.MAX_STEPS_PER_EPISODE - 1
+        if max_start > self.config.WINDOW_SIZE:
+            self.current_step = self.np_random.integers(self.config.WINDOW_SIZE, max_start)
+        else:
+            self.current_step = self.config.WINDOW_SIZE
+            
+        self.start_step = self.current_step
         
         return self._get_observation(), {}
 
@@ -48,7 +63,7 @@ class OptionsProxyEnv(gym.Env):
         start_idx = self.current_step - self.config.WINDOW_SIZE
         end_idx = self.current_step
         
-        obs_features = self.df[self.feature_cols].iloc[start_idx:end_idx].values
+        obs_features = self._features_arr[start_idx:end_idx]
         
         # Add position and minutes to obs
         pos_array = np.full((self.config.WINDOW_SIZE, 1), self.position, dtype=np.float32)
@@ -63,16 +78,12 @@ class OptionsProxyEnv(gym.Env):
         done = False
         truncated = False
         
-        if self.current_step >= len(self.df) - self.config.LATENCY_MINUTES - 1:
+        if self.current_step >= len(self.df) - 1 or (self.current_step - self.start_step) >= self.config.MAX_STEPS_PER_EPISODE:
             truncated = True
             return self._get_observation(), reward, done, truncated, {}
             
-        current_price = self.df['close'].iloc[self.current_step]
-        prev_price = self.df['close'].iloc[self.current_step - 1]
-        
-        # Execution price with latency and slippage
-        exec_idx = self.current_step + self.config.LATENCY_MINUTES
-        market_exec_price = self.df['close'].iloc[exec_idx]
+        current_price = self._close_arr[self.current_step]
+        prev_price = self._close_arr[self.current_step - 1]
         
         slippage_ticks = self.np_random.uniform(0, self.config.SLIPPAGE_MAX_TICKS)
         slippage_amt = slippage_ticks * 0.05
@@ -80,16 +91,8 @@ class OptionsProxyEnv(gym.Env):
         step_reward = 0.0
         fee = 0.0
         
-        # PnL accounting for existing position
-        if self.position == 1:
-            step_reward += (current_price - prev_price)
-        elif self.position == 2:
-            step_reward += (prev_price - current_price)
-            
-        # State transitions
-        just_entered = False
-        trade_executed = False
         new_position = self.position
+        just_entered = False
 
         # Action 0: Hold
         # Action 1: Buy
@@ -97,41 +100,59 @@ class OptionsProxyEnv(gym.Env):
         if action == 1:
             if self.position == 0:
                 new_position = 1 # Enter Long
-                trade_executed = True
-                just_entered = True
             elif self.position == 2:
                 new_position = 0 # Exit Short
-                trade_executed = True
         elif action == 2:
             if self.position == 0:
                 new_position = 2 # Enter Short
-                trade_executed = True
-                just_entered = True
             elif self.position == 1:
                 new_position = 0 # Exit Long
-                trade_executed = True
 
-        if trade_executed:
-            if action == 1: # Buying
-                p_exec = market_exec_price + slippage_amt
-            else: # Selling
-                p_exec = market_exec_price - slippage_amt
-                
+        # Handle Exits
+        if self.position == 1 and new_position == 0:
+            p_exec = current_price - slippage_amt
             fee += p_exec * self.config.TRANSACTION_FEE_PCT
+            step_reward += (p_exec - prev_price)
+        elif self.position == 2 and new_position == 0:
+            p_exec = current_price + slippage_amt
+            fee += p_exec * self.config.TRANSACTION_FEE_PCT
+            step_reward += (prev_price - p_exec)
             
-            if just_entered:
-                self.entry_price = p_exec
-                self.minutes_in_position = 0
+        # Handle Holds
+        elif self.position == 1 and new_position == 1:
+            step_reward += (current_price - prev_price)
+        elif self.position == 2 and new_position == 2:
+            step_reward += (prev_price - current_price)
             
-            self.position = new_position
+        # Handle Entries
+        elif self.position == 0 and new_position == 1:
+            p_exec = current_price + slippage_amt
+            fee += p_exec * self.config.TRANSACTION_FEE_PCT
+            step_reward += (current_price - p_exec)
+            self.entry_price = p_exec
+            self.minutes_in_position = 0
+            just_entered = True
+        elif self.position == 0 and new_position == 2:
+            p_exec = current_price - slippage_amt
+            fee += p_exec * self.config.TRANSACTION_FEE_PCT
+            step_reward += (p_exec - current_price)
+            self.entry_price = p_exec
+            self.minutes_in_position = 0
+            just_entered = True
+
+        self.position = new_position
             
         # Holding penalty
         penalty = 0.0
         if self.position != 0:
             if not just_entered:
                 self.minutes_in_position += 1
-            # Linear theta decay: constant penalty per minute held
-            penalty = self.config.THETA_DECAY_COEFF
+            # Increasing penalty as you hold longer (linear increase makes total cost quadratic)
+            penalty += self.config.THETA_DECAY_COEFF * (1.0 + (self.minutes_in_position / 60.0))
+            
+            # Overnight penalty
+            if self._is_new_day_arr[self.current_step]:
+                penalty += self.config.OVERNIGHT_HOLD_PENALTY
             
         total_step_reward = step_reward - fee - penalty
         self.balance += total_step_reward
